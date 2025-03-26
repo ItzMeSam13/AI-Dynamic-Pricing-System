@@ -12,3 +12,58 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id              String   @id @default(uuid())  
+  name            String  
+  email           String   @unique  
+  password        String  
+  businessCategory String  
+  createdAt       DateTime @default(now())  
+  supabase_id    String
+  // Relations
+  products        Product[]
+  customRequests  CustomProductRequest[]
+}
+
+model Product {
+  id               String  @id @default(uuid())  
+  name             String  
+  category         String  
+  competitorPrice  Float  
+  aiSuggestedPrice Float  
+  imageUrl         String?  
+  createdAt        DateTime @default(now())  
+
+  // Foreign Key (Links product to a user)
+  userId String  
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Competitor Price & Stock Tracking
+  competitorPrices CompetitorPrice[]
+}
+
+model CompetitorPrice {
+  id          String  @id @default(uuid())  
+  price       Float  
+  stock       Int     // Stock now only stored here  
+  source      String  // Example: "Amazon", "Flipkart"  
+  fetchedAt   DateTime @default(now())  
+
+  // Foreign Key (Links to Product)
+  productId   String  
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model CustomProductRequest {
+  id         String  @id @default(uuid())  
+  productName String  
+  category   String  
+  costPrice  Float?  
+  status     String  @default("pending")  // ["pending", "fetched", "rejected"]  
+  createdAt  DateTime @default(now())  
+
+  // Foreign Key (Links to User)
+  userId String  
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
