@@ -1,0 +1,33 @@
+{
+  "name": "ai-dynamic-pricing-system",
+  "version": "1.0.0",
+  "description": "AI-powered dynamic pricing system for e-commerce sellers. Analyzes real-time market trends, competitor prices, and customer behavior to suggest optimized prices. Built with React, Next.js, Node.js, Prisma, Supabase, and Express.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ItzMeSam13/AI-Dynamic-Pricing-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ItzMeSam13/AI-Dynamic-Pricing-System/issues"
+  },
+  "homepage": "https://github.com/ItzMeSam13/AI-Dynamic-Pricing-System#readme",
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@supabase/supabase-js": "^2.49.3",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "validator": "^13.15.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.5.0"
+  }
+}
