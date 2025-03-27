@@ -52,7 +52,7 @@ export default function SignUp() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8000/auth/signup", formData);
+      const response = await axios.post("http://localhost:8000/auth/register", formData);
       alert("Sign-Up Successful!");
       setFormData({ name: "", email: "", password: "", businessName: "", businessCategory: "", businessSubCategory: "" });
     } catch (error) {
