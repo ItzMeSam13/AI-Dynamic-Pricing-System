@@ -24,7 +24,7 @@ const Login = () => {
       if (!res.ok) throw new Error(data.error); // Fixed error message
 
       // Store token & user data
-      token= data.session.access_token;
+      const token= data.session.access_token;
    
       localStorage.setItem("user", JSON.stringify(data.user));
 
