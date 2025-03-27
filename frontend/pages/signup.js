@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -179,8 +180,9 @@ export default function SignUp() {
           </button>
 
           <p className="text-center text-gray-700 mt-4">
-            Already have an account? <a href="#" className="text-blue-600 hover:underline">Login</a>
-          </p>
+  Already have an account? 
+  <Link href="/login" className="text-blue-600 hover:underline"> Login </Link>
+</p>
         </form>
       </div>
     </div>
