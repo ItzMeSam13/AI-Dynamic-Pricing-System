@@ -20,7 +20,6 @@ model User {
 }
 
 model Product {
-  id    Int    @id @default(autoincrement())
   name             String
   category         String
   competitorPrice  Float
@@ -28,6 +27,7 @@ model Product {
   imageUrl         String?
   createdAt        DateTime          @default(now())
   userId           String
+  id               Int               @id @default(autoincrement())
   competitorPrices CompetitorPrice[]
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

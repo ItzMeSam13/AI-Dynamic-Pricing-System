@@ -9,9 +9,10 @@ const EXCHANGE_RATE_API = "https://api.exchangerate-api.com/v4/latest/USD";
 export const fetchProducts = async (req, res) => {
     try {
         const { userId } = req.body;
+        
 
         if (!userId) {
-            return res.status(400).json({ error: "User ID is required" });
+            return res.status(run400).json({ error: "User ID is required" });
         }
 
         // Fetch business category from Supabase
