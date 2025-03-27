@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -25,14 +24,14 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      router.push("/dashboard"); // Redirect after login
+      router.push("/dashboard");
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-700 via-purple-700 to-purple-900">
       <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-xl">
         <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
@@ -59,7 +58,7 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full mt-6 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+            className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
           >
             Login
           </button>
