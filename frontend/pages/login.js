@@ -1,5 +1,6 @@
-/* eslint-disable react/no-unescaped-entities */
+
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 const Login = () => {
@@ -20,12 +21,14 @@ const Login = () => {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) throw new Error(data.error); // Fixed error message
 
-      localStorage.setItem("token", data.session.access_token);
+      // Store token & user data
+      token= data.session.access_token;
+   
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      router.push("/dashboard"); // Redirect after login
+      router.push("/dashboard"); // Redirect to dashboard after login
     } catch (err) {
       setError(err.message);
     }
@@ -65,8 +68,9 @@ const Login = () => {
           </button>
         </form>
         <p className="mt-4 text-center text-gray-600">
-          Don't have an account? 
-          <a href="/signup" className="text-blue-500 hover:underline"> Sign up</a>
+          <Link href="/signup" legacyBehavior>
+            <a className="text-blue-500 hover:underline"> Sign up</a>
+          </Link>
         </p>
       </div>
     </div>
