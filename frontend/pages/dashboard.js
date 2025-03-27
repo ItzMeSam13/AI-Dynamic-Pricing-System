@@ -84,7 +84,7 @@ const Dashboard = () => {
               {products.map((product) => (
                 <div key={product.id} className="bg-white text-black p-5 shadow-lg rounded-lg flex flex-col items-center">
                   <div className="h-20 w-full bg-gray-200 flex items-center justify-center">
-                    <img src={product.image} alt={product.title} className="h-full object-contain" />
+                    <img src={product.image} alt={product.title} className="h-full object-contain"/>
                   </div>
                   <h3 className="text-lg font-semibold mt-4 text-center">{product.title}</h3>
                   <p className="text-sm text-gray-600 text-center">
