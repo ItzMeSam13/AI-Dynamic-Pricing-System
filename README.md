@@ -44,32 +44,43 @@ Folder Structure:
 
 Approach to Solve the Problem:
 In the B2B market, businesses struggle to price their products competitively due to fluctuating market trends and competitor pricing. Our AI-powered pricing system solves this by:
+<br>
 Fetching competitor prices via SerpAPI (Google Shopping Scraper).
 Using AI & Market Analysis to suggest optimized pricing based on competitor data, demand trends, and currency exchange rates.
+<br>
 Providing dynamic pricing recommendations that help businesses maximize profits.
 
 
 Tech Stack:
 Backend: Node.js, Express.js, Prisma, Supabase
+<br>
 Frontend: React.js with Next.js
+<br>
 Database: Supabase (PostgreSQL)
 
 APIs Used:
 SerpAPI – Fetching competitor prices from Google Shopping
+<br>
 Exchange Rate API – Converting prices based on currency exchange rates
+<br>
 gemini AI – Providing price suggestions to maximize profit
 
 
 Build and run commands for your project:
 cd Backend
+<br>
 npm install
+<br>
 npm start  # Runs the Express server on port 8000
 
 cd Frontend
+<br>
 npm install
+<br>
 npm run dev  # Runs Next.js on localhost:3000
 
 cd Backend
+<br>
 npx prisma migrate dev  # Migrate database schema
 
 
