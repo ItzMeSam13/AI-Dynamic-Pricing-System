@@ -21,7 +21,7 @@ const Login = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.session.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/dashboard");
