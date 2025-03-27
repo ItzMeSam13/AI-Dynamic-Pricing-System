@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import supabase from "../utils/SupabaseClient.js";
+import supabase from "../Utils/supabaseclient.js";
 
 const prisma = new PrismaClient();
 
@@ -65,6 +65,12 @@ export const Login = async (req, res) => {
 		const user = await prisma.user.findUnique({
 			where: { email },
 		});
+
+		const { data: userData, error: userError } = await supabase
+		.from("User")
+		.select("businessCategory")
+		.eq("email", email)
+		.single();
 
 		if (!user) {
 			return res.status(404).json({ error: "User not found in database" });

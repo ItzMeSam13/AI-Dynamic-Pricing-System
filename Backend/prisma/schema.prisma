@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,56 +8,47 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())  
-  name            String  
-  email           String   @unique  
-  password        String  
-  businessCategory String  
-  createdAt       DateTime @default(now())  
-  supabase_id    String
-  // Relations
-  products        Product[]
-  customRequests  CustomProductRequest[]
+  id               String                 @id @default(uuid())
+  name             String
+  email            String                 @unique
+  password         String
+  businessCategory String
+  createdAt        DateTime               @default(now())
+  supabase_id      String
+  customRequests   CustomProductRequest[]
+  products         Product[]
 }
 
 model Product {
-  id               String  @id @default(uuid())  
-  name             String  
-  category         String  
-  competitorPrice  Float  
-  aiSuggestedPrice Float  
-  imageUrl         String?  
-  createdAt        DateTime @default(now())  
-
-  // Foreign Key (Links product to a user)
-  userId String  
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Competitor Price & Stock Tracking
+  id    Int    @id @default(autoincrement())
+  name             String
+  category         String
+  competitorPrice  Float
+  aiSuggestedPrice Float?
+  imageUrl         String?
+  createdAt        DateTime          @default(now())
+  userId           String
   competitorPrices CompetitorPrice[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CompetitorPrice {
-  id          String  @id @default(uuid())  
-  price       Float  
-  stock       Int     // Stock now only stored here  
-  source      String  // Example: "Amazon", "Flipkart"  
-  fetchedAt   DateTime @default(now())  
-
-  // Foreign Key (Links to Product)
-  productId   String  
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  price     Float
+  stock     Int
+  source    String
+  fetchedAt DateTime @default(now())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model CustomProductRequest {
-  id         String  @id @default(uuid())  
-  productName String  
-  category   String  
-  costPrice  Float?  
-  status     String  @default("pending")  // ["pending", "fetched", "rejected"]  
-  createdAt  DateTime @default(now())  
-
-  // Foreign Key (Links to User)
-  userId String  
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  productName String
+  category    String
+  costPrice   Float?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
