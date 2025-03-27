@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const EXCHANGE_RATE_API = `https://api.exchangerate-api.com/v4/latest/USD`;
+const EXCHANGE_RATE_API = "https://api.exchangerate-api.com/v4/latest/USD";
 
 export const fetchProducts = async (req, res) => {
     try {
@@ -67,7 +67,7 @@ export const fetchProducts = async (req, res) => {
             };
         });
 
-        // ✅ FIXED: Pass `userId`
+        // ✅ FIXED: Pass userId
         await storeProductsInSupabase(products, userId);
 
         res.json({ category: businessCategory, products });
@@ -133,7 +133,7 @@ const upsertProduct = async (product, userId) => {
     }
 };
 
-// ✅ FIXED: Function now properly takes `userId`
+// ✅ FIXED: Function now properly takes userId
 const storeProductsInSupabase = async (products, userId) => {
     for (const product of products) {
         await upsertProduct(product, userId);
