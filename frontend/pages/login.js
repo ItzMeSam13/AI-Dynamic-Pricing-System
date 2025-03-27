@@ -1,17 +1,50 @@
-import React from "react";
+/* eslint-disable react/no-unescaped-entities */
+import React, { useState } from "react";
+import { useRouter } from "next/router";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      router.push("/dashboard"); // Redirect after login
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-xl">
         <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
-        <form className="mt-4">
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        <form className="mt-4" onSubmit={handleLogin}>
           <div>
             <label className="block text-gray-700">Email</label>
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 mt-1 border rounded-lg text-gray-500 focus:text-black focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mt-4">
@@ -19,7 +52,9 @@ const Login = () => {
             <input
               type="password"
               placeholder="Enter your password"
-              className="w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 mt-1 border rounded-lg text-gray-500 focus:text-black focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <button
@@ -31,7 +66,7 @@ const Login = () => {
         </form>
         <p className="mt-4 text-center text-gray-600">
           Don't have an account? 
-          <a href="#" className="text-blue-500 hover:underline"> Sign up</a>
+          <a href="/signup" className="text-blue-500 hover:underline"> Sign up</a>
         </p>
       </div>
     </div>

@@ -18,7 +18,7 @@ export const Register = async (req, res) => {
 			.status(400)
 			.json({ error: "Password must be at least 6 characters" });
 	}
-	const hashedPassword = await bcrypt.hash(password, 10);
+
 	try {
 		const { data, error } = await supabase.auth.signUp({
 			name,
