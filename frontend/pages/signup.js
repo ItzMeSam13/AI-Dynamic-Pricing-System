@@ -53,11 +53,29 @@ export default function SignUp() {
     setLoading(true);
     try {
       const response = await axios.post("http://localhost:8000/auth/register", formData);
-      alert("Sign-Up Successful!");
-      setFormData({ name: "", email: "", password: "", businessName: "", businessCategory: "", businessSubCategory: "" });
+
+      console.log("Signup Successful:", response.data); // Logs response data
+      alert(`Sign-Up Successful: ${response.data.message || "Welcome!"}`); // Uses response data in alert
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        businessName: "",
+        businessCategory: "",
+        businessSubCategory: "",
+      });
     } catch (error) {
-      alert("Error signing up. Please try again.");
-      console.error("Signup Error:", error);
+      if (error.response) {
+        console.error("Error Response:", error.response.data);
+        alert(`Signup failed: ${error.response.data.message || "Unknown error"}`);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        alert("No response from server. Please check your connection.");
+      } else {
+        console.error("Request error:", error.message);
+        alert("An error occurred. Please try again.");
+      }
     }
     setLoading(false);
   };
@@ -69,39 +87,65 @@ export default function SignUp() {
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="mb-4">
             <label className="block text-gray-700 font-medium">Name</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} 
-                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900" />
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+            />
             {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 font-medium">Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} 
-                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900" />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+            />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 font-medium">Password</label>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} 
-                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900" />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+            />
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 font-medium">Business Name</label>
-            <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} 
-                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900" />
+            <input
+              type="text"
+              name="businessName"
+              value={formData.businessName}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+            />
             {errors.businessName && <p className="text-red-500 text-sm">{errors.businessName}</p>}
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 font-medium">Business Category</label>
-            <select name="businessCategory" value={formData.businessCategory} onChange={handleChange} 
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900">
+            <select
+              name="businessCategory"
+              value={formData.businessCategory}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+            >
               <option value="">Select</option>
               {Object.keys(categories).map((category) => (
-                <option key={category} value={category}>{category.replace(/-/g, ' ')}</option>
+                <option key={category} value={category}>
+                  {category.replace(/-/g, " ")}
+                </option>
               ))}
             </select>
             {errors.businessCategory && <p className="text-red-500 text-sm">{errors.businessCategory}</p>}
@@ -110,23 +154,33 @@ export default function SignUp() {
           {formData.businessCategory && categories[formData.businessCategory] && (
             <div className="mb-4">
               <label className="block text-gray-700 font-medium">Business Sub-Category (Optional)</label>
-              <select name="businessSubCategory" value={formData.businessSubCategory} onChange={handleChange} 
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900">
+              <select
+                name="businessSubCategory"
+                value={formData.businessSubCategory}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700 text-gray-900"
+              >
                 <option value="">Select</option>
                 {categories[formData.businessCategory].map((subCategory) => (
-                  <option key={subCategory} value={subCategory}>{subCategory}</option>
+                  <option key={subCategory} value={subCategory}>
+                    {subCategory}
+                  </option>
                 ))}
               </select>
             </div>
           )}
 
-          <button type="submit" 
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition" 
-                  disabled={loading}>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
+          >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
 
-          <p className="text-center text-gray-700 mt-4">Already have an account? <a href="#" className="text-blue-600 hover:underline">Login</a></p>
+          <p className="text-center text-gray-700 mt-4">
+            Already have an account? <a href="#" className="text-blue-600 hover:underline">Login</a>
+          </p>
         </form>
       </div>
     </div>

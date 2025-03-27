@@ -8,6 +8,9 @@ import {
   BarChart2, 
   Target 
 } from 'lucide-react';
+
+// Update any localhost references to use port 8000
+
 import { useRouter } from "next/navigation";
 
 
@@ -47,8 +50,8 @@ const AIPricingLandingPage = () => {
       const interval = setInterval(() => {
         setProducts(prev => prev.map(product => ({
           ...product,
-          aiPrice: product.aiPrice + (Math.random() * 10 - 5),
-          demand: Math.min(1, Math.max(0, product.demand + (Math.random() * 0.1 - 0.05)))
+          aiPrice: product.aiPrice + (Math.random() * 10 - 5), // Client-only logic
+          demand: Math.min(1, Math.max(0, product.demand + (Math.random() * 0.1 - 0.05))) // Client-only logic
         })));
       }, 1500);
 
@@ -90,7 +93,7 @@ const AIPricingLandingPage = () => {
                 key={product.name} 
                 className="bg-white/10 backdrop-blur-lg rounded-xl p-6 transform transition-all duration-300"
                 style={{
-                  transform: `scale(${1 + Math.sin(Date.now() * 0.001 + index) * 0.05})`,
+                  transform: `scale(${1 + Math.sin(performance.now() * 0.001 + index) * 0.05})`,
                   opacity: 0.9
                 }}
               >
