@@ -30,7 +30,7 @@ export const fetchAISuggestedPrices = async (products) => {
 						parts: [
 							{
 								text: `Suggest ideal selling prices in INR for the following products. 
-									Provide only numeric values separated by commas:
+									Provide only numeric values separated by commas the ai generated price should be less then the competitiors price not very small nott too and should be different for each item as per items profit and other thingd:
 									\n\n${promptText}`,
 							},
 						],

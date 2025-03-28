@@ -109,8 +109,8 @@ const Dashboard = () => {
                   />
                   <div className="text-center">
                     <h2 className="text-lg font-semibold text-gray-900">{product.name}</h2>
-                    <p className="text-gray-600">Competitor Price: <span className="text-gray-900 font-bold">{product.competitorPrice}</span></p>
-                    <p className="text-gray-600">AI Suggested Price: <span className="text-green-600 font-bold">{product.aiSuggestedPrice}</span></p>
+                    <p className="text-gray-600">Competitor Price: <span className="text-gray-900 font-bold">{product.competitorPrice} Rs</span></p>
+                    <p className="text-gray-600">AI Suggested Price: <span className="text-green-600 font-bold">{product.aiSuggestedPrice} Rs</span></p>
                     <p className="text-gray-500 text-sm">Source: {product.source}</p>
                   </div>
                 </div>
