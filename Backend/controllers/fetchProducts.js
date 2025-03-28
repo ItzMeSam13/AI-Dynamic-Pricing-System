@@ -86,12 +86,14 @@ export const fetchProducts = async (req, res) => {
 };
 
 // Function to store/update products in Supabase
+
+
 const upsertProduct = async (product, userId) => {
 	try {
 		// Check if the product already exists
 		const { data: existingProduct, error } = await supabase
 			.from("Product")
-			.select("id, competitorPrice")
+			.select("id, competitorPrice, aiSuggestedPrice")
 			.eq("name", product.name)
 			.eq("category", product.category)
 			.eq("userId", userId)
@@ -103,12 +105,16 @@ const upsertProduct = async (product, userId) => {
 		}
 
 		if (existingProduct) {
-			// Update only if competitorPrice has changed
-			if (existingProduct.competitorPrice !== product.competitorPrice) {
+			// ✅ Update aiSuggestedPrice if it has changed
+			if (
+				existingProduct.competitorPrice !== product.competitorPrice ||
+				existingProduct.aiSuggestedPrice !== product.aiSuggestedPrice
+			) {
 				const { error: updateError } = await supabase
 					.from("Product")
 					.update({
 						competitorPrice: product.competitorPrice,
+						aiSuggestedPrice: product.aiSuggestedPrice, // ✅ Ensure AI price is updated
 						imageUrl: product.imageUrl, // Optional update
 					})
 					.eq("id", existingProduct.id);
@@ -119,13 +125,13 @@ const upsertProduct = async (product, userId) => {
 				}
 			}
 		} else {
-			// Insert new product
+			// ✅ Insert new product with aiSuggestedPrice
 			const { error: insertError } = await supabase.from("Product").insert([
 				{
 					name: product.name,
 					category: product.category,
 					competitorPrice: product.competitorPrice,
-					aiSuggestedPrice: product.aiSuggestedPrice || null,
+					aiSuggestedPrice: product.aiSuggestedPrice || null, // ✅ Store AI price
 					imageUrl: product.imageUrl || null,
 					userId: userId, // Required field
 				},
@@ -140,6 +146,8 @@ const upsertProduct = async (product, userId) => {
 		console.error("Unexpected error in upsertProduct:", err);
 	}
 };
+
+
 
 // ✅ FIXED: Function now properly takes userId
 const storeProductsInSupabase = async (products, userId) => {
