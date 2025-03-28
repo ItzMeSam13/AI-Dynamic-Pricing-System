@@ -90,7 +90,7 @@ export default function SignUp() {
 	};
 
 	return (
-		<div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-900 via-purple-800 to-purple-900">
+		<div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-white via-blue-100 to-blue-200">
 			<div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 				<h2 className="text-2xl font-semibold text-center text-gray-800">
 					Sign Up
@@ -209,6 +209,12 @@ export default function SignUp() {
 					>
 						{loading ? "Signing Up..." : "Sign Up"}
 					</button>
+
+					<Link href="/login">
+						<button className="w-full mt-3 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 transition">
+							Login
+						</button>
+					</Link>
 				</form>
 			</div>
 		</div>
