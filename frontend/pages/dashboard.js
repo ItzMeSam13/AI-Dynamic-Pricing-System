@@ -1,63 +1,82 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useEffect, useState } from "react";
-import { FaHome, FaBox, FaChartBar, FaSignOutAlt, FaUserCircle, FaEdit } from "react-icons/fa";
+import { FaHome, FaBox, FaChartBar, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import axios from "axios";
 
+// Sidebar Component
 const Sidebar = () => (
-  <div className="w-72 bg-gray-900 text-white h-screen p-6 flex flex-col justify-between">
+  <div className="w-72 bg-gray-900 text-white h-screen p-6 flex flex-col justify-between shadow-lg">
     <div>
-      <h1 className="text-xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-xl font-bold mb-6 text-center tracking-wide">📊 Dashboard</h1>
       <ul className="space-y-4">
-        <li className="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded cursor-pointer">
-          <FaUserCircle />
+        <li className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition duration-200">
+          <FaUserCircle className="text-xl" />
           <span>Profile</span>
         </li>
-        <li className="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded cursor-pointer">
-          <FaHome />
+        <li className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition duration-200">
+          <FaHome className="text-xl" />
           <span>Home</span>
         </li>
-        <li className="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded cursor-pointer">
-          <FaBox />
+        <li className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition duration-200">
+          <FaBox className="text-xl" />
           <span>Products</span>
         </li>
-        <li className="flex items-center space-x-2 hover:bg-gray-700 p-2 rounded cursor-pointer">
-          <FaChartBar />
+        <li className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-lg cursor-pointer transition duration-200">
+          <FaChartBar className="text-xl" />
           <span>Reports</span>
         </li>
       </ul>
     </div>
-    <li className="flex items-center space-x-2 hover:bg-red-600 p-2 rounded cursor-pointer mt-auto">
-      <FaSignOutAlt />
+    <li className="flex items-center space-x-3 hover:bg-red-600 p-3 rounded-lg cursor-pointer transition duration-200 mt-auto">
+      <FaSignOutAlt className="text-xl" />
       <span>Logout</span>
     </li>
   </div>
 );
 
+// Navbar Component
 const Navbar = () => (
   <div className="bg-gradient-to-r from-blue-900 to-purple-900 shadow-md p-4 flex justify-between items-center w-full text-white">
-    <h1 className="text-xl font-bold">Product Pricing Dashboard</h1>
+    <h1 className="text-xl font-bold">📈 AI-Powered Pricing Dashboard</h1>
   </div>
 );
 
 const Dashboard = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        console.log("Fetching products...");
-        const response = await fetch("https://fakestoreapi.com/products");
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token");
+
+        if (!userId || !token) {
+          setError("User is not authenticated.");
+          setLoading(false);
+          return;
         }
 
-        const data = await response.json();
-        console.log("Fetched Data:", data);
-        setProducts(data.slice(0, 6));
+        const response = await axios.get(`http://localhost:8000/dashboard/fetch-products`, {
+          params: { userId },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("Full API Response:", response.data);
+
+        let fetchedProducts = response.data?.products || [];
+        if (!Array.isArray(fetchedProducts)) {
+          console.error("Unexpected response format:", fetchedProducts);
+          fetchedProducts = [];
+        }
+        setProducts(fetchedProducts);
+        
       } catch (error) {
-        console.error("Error fetching products:", error.message);
-        setError(error.message);
+        console.error("Error fetching products:", error.response?.data || error.message);
+        setError(error.response?.data?.error || "Failed to fetch products.");
+        setProducts([]); 
       } finally {
         setLoading(false);
       }
@@ -67,33 +86,33 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-br from-blue-900 to-purple-900">
+    <div className="flex h-screen w-screen overflow-hidden bg-gray-100">
       <Sidebar />
       <div className="flex-1 h-screen flex flex-col overflow-hidden">
         <Navbar />
-        <div className="flex-1 p-8 flex flex-col justify-center overflow-auto">
-          <h2 className="text-2xl font-bold mb-6 text-center text-white">
-            🔥 Latest AI-Powered Price Insights
+        <div className="flex-1 p-6 flex flex-col overflow-auto">
+          <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">
+            🚀 AI-Powered Product Pricing
           </h2>
           {loading ? (
-            <p className="text-center text-white">Loading products...</p>
+            <p className="text-center text-gray-600">Loading products...</p>
           ) : error ? (
             <p className="text-center text-red-500">Error: {error}</p>
           ) : (
-            <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8 w-full px-8">
-              {products.map((product) => (
-                <div key={product.id} className="bg-white text-black p-5 shadow-lg rounded-lg flex flex-col items-center">
-                  <div className="h-20 w-full bg-gray-200 flex items-center justify-center">
-                    <img src={product.image} alt={product.title} className="h-full object-contain"/>
+            <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 w-full">
+              {products.map((product, index) => (
+                <div key={index} className="bg-white shadow-lg rounded-lg p-4 transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+                  <img 
+                    src={product.imageUrl || "/placeholder.jpg"}  
+                    alt={product.title || "No image"} 
+                    className="h-48 w-full object-cover rounded-lg mb-3"
+                  />
+                  <div className="text-center">
+                    <h2 className="text-lg font-semibold text-gray-900">{product.name}</h2>
+                    <p className="text-gray-600">Competitor Price: <span className="text-gray-900 font-bold">{product.competitorPrice}</span></p>
+                    <p className="text-gray-600">AI Suggested Price: <span className="text-green-600 font-bold">{product.aiSuggestedPrice}</span></p>
+                    <p className="text-gray-500 text-sm">Source: {product.source}</p>
                   </div>
-                  <h3 className="text-lg font-semibold mt-4 text-center">{product.title}</h3>
-                  <p className="text-sm text-gray-600 text-center">
-                    Competitor Price: <span className="font-bold">${(product.price + 10).toFixed(2)}</span>
-                  </p>
-                  <p className="text-sm text-gray-600 text-center">
-                    AI Generated Price: <span className="font-bold">${product.price.toFixed(2)}</span>
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2 text-center">Source: FakeStoreAPI</p>
                 </div>
               ))}
             </div>
