@@ -1,6 +1,7 @@
 import supabase from "../Utils/supabaseclient.js";
 import axios from "axios";
 import dotenv from "dotenv";
+import { fetchAISuggestedPrices } from "../Utils/GeminiAi.js";
 
 dotenv.config();
 
@@ -83,130 +84,130 @@ export const fetchProducts = async (req, res) => {
 
         if (userError || !userData) return res.status(404).json({ error: "User not found" });
 
-        const businessCategory = userData.businessCategory;
-        console.log(`Fetching products for category: ${businessCategory}`);
+		const businessCategory = userData.businessCategory;
+		console.log(`Fetching products for category: ${businessCategory}`);
 
-        // Fetch from SerpAPI
-        const apiUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-            businessCategory
-        )}&api_key=${process.env.SERP_API_KEY}`;
-        const response = await axios.get(apiUrl);
+		// Fetch products from SerpAPI
+		const apiUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
+			businessCategory
+		)}&api_key=${process.env.SERP_API_KEY}`;
+		const response = await axios.get(apiUrl);
 
-        if (!response.data || !response.data.shopping_results) {
-            return res.status(404).json({ error: "No products found" });
-        }
+		if (!response.data || !response.data.shopping_results) {
+			return res.status(404).json({ error: "No products found" });
+		}
 
-        // Fetch exchange rate
-        const exchangeRateRes = await axios.get(EXCHANGE_RATE_API);
-        const usdToInr = exchangeRateRes.data.rates.INR;
+		// Fetch exchange rate for USD to INR
+		const exchangeRateRes = await axios.get(EXCHANGE_RATE_API);
+		const usdToInr = exchangeRateRes.data.rates.INR;
 
-        const productPriceMap = new Map();
+		// Extract and convert product details
+		const products = response.data.shopping_results.map((product) => {
+			let priceInRs = "Price not available";
+			let priceNum = null;
 
-        const products = response.data.shopping_results.map((product) => {
-            let priceInRs = "Price not available";
-            let priceNum = null;
+			if (product.price) {
+				const priceInUsd = parseFloat(product.price.replace(/[^0-9.]/g, ""));
+				if (!isNaN(priceInUsd)) {
+					priceNum = priceInUsd * usdToInr;
+					priceInRs = `₹${priceNum.toFixed(2)}`;
+				}
+			}
 
-            console.log(`Raw Price Data for ${product.title}:`, product.price);
+			return {
+				name: product.title,
+				competitorPrice: priceNum, // ✅ Corrected to store as a number
+				aiSuggestedPrice: null, // Optional placeholder
+				imageUrl: product.thumbnail || null,
+				category: businessCategory,
+				link: product.link,
+				source: product.source,
+				stock: product.stock || "Unknown",
+			};
+		});
+		const aiPrices = await fetchAISuggestedPrices(products);
 
-            if (product.price) {
-                const priceMatch = product.price.match(/[\d,.]+/);
-                if (priceMatch) {
-                    const priceInUsd = parseFloat(priceMatch[0].replace(/,/g, ""));
-                    if (!isNaN(priceInUsd)) {
-                        priceNum = parseFloat((priceInUsd * usdToInr).toFixed(2));
-                        priceInRs = `₹${priceNum.toFixed(2)}`;
-                    }
-                }
-            }
+		products.forEach((product, index) => {
+			product.aiSuggestedPrice = aiPrices[index] || null;
+		});
 
-            console.log(`Extracted price for ${product.title}:`, priceNum);
+		// ✅ FIXED: Pass userId
+		await storeProductsInSupabase(products, userId);
 
-            const productName = product.title || 'Unknown Product';
-            if (productName) {
-                if (!productPriceMap.has(productName)) {
-                    productPriceMap.set(productName, []);
-                }
-                productPriceMap.get(productName).push(priceNum);
-            }
-
-            return {
-                name: productName,
-                competitorPrice: priceNum,
-                aiSuggestedPrice: null,
-                imageUrl: product.thumbnail || null,
-                category: businessCategory,
-                link: product.link,
-                source: product.source,
-                stock: product.stock || "Unknown",
-            };
-        });
-
-        products.forEach((product) => {
-            const prices = productPriceMap.get(product.name) || [];
-            console.log(`Product: ${product.name}, Stored Competitor Prices:`, prices);
-
-            const validPrices = prices.filter(price => price !== null && !isNaN(price));
-            console.log(`Valid Prices for ${product.name}:`, validPrices);
-
-            const aiPricing = calculateAIOptimizedPrice(prices, product.name);
-            
-            if (aiPricing) {
-                product.aiSuggestedPrice = aiPricing.price;
-                product.priceIntelligence = aiPricing.intelligence;
-            } else {
-                product.aiSuggestedPrice = "Price not available";
-            }
-
-            console.log(`AI Suggested Price for ${product.name}:`, product.aiSuggestedPrice);
-        });
-
-        await storeProductsInSupabase(products, userId);
-        res.json({ category: businessCategory, products });
-    } catch (error) {
-        console.error("Error fetching products:", error);
-        res.status(500).json({ error: "Failed to fetch product data" });
-    }
+		res.json({ category: businessCategory, products });
+	} catch (error) {
+		console.error("Error fetching products:", error);
+		res.status(500).json({ error: "Failed to fetch product data" });
+	}
 };
 
-// Store products in Supabase
-const storeProductsInSupabase = async (products, userId) => {
-    for (const product of products) {
-        await upsertProduct(product, userId);
-    }
-};
+// Function to store/update products in Supabase
+
 
 const upsertProduct = async (product, userId) => {
-    try {
-        console.log(`Saving to Supabase: ${product.name}, AI Price: ${product.aiSuggestedPrice}`);
+	try {
+		// Check if the product already exists
+		const { data: existingProduct, error } = await supabase
+			.from("Product")
+			.select("id, competitorPrice, aiSuggestedPrice")
+			.eq("name", product.name)
+			.eq("category", product.category)
+			.eq("userId", userId)
+			.single();
 
-        const { data: existingProduct, error } = await supabase
-            .from("Product")
-            .select("id, competitorPrice, aiSuggestedPrice")
-            .eq("name", product.name)
-            .eq("category", product.category)
-            .eq("userId", userId)
-            .single();
+		if (error && error.code !== "PGRST116") {
+			console.error("Error checking existing product:", error);
+			return;
+		}
 
-        if (error && error.code !== "PGRST116") return console.error("Error checking product:", error);
+		if (existingProduct) {
+			// ✅ Update aiSuggestedPrice if it has changed
+			if (
+				existingProduct.competitorPrice !== product.competitorPrice ||
+				existingProduct.aiSuggestedPrice !== product.aiSuggestedPrice
+			) {
+				const { error: updateError } = await supabase
+					.from("Product")
+					.update({
+						competitorPrice: product.competitorPrice,
+						aiSuggestedPrice: product.aiSuggestedPrice, // ✅ Ensure AI price is updated
+						imageUrl: product.imageUrl, // Optional update
+					})
+					.eq("id", existingProduct.id);
 
-        if (existingProduct) {
-            await supabase
-                .from("Product")
-                .update({ 
-                    competitorPrice: product.competitorPrice, 
-                    aiSuggestedPrice: product.aiSuggestedPrice,
-                    priceIntelligence: product.priceIntelligence 
-                })
-                .eq("id", existingProduct.id);
-        } else {
-            await supabase.from("Product").insert([{ 
-                ...product, 
-                userId 
-            }]);
-        }
-    } catch (err) {
-        console.error("Error in upsertProduct:", err);
-    }
+				if (updateError) {
+					console.error("Error updating product:", updateError);
+					return;
+				}
+			}
+		} else {
+			// ✅ Insert new product with aiSuggestedPrice
+			const { error: insertError } = await supabase.from("Product").insert([
+				{
+					name: product.name,
+					category: product.category,
+					competitorPrice: product.competitorPrice,
+					aiSuggestedPrice: product.aiSuggestedPrice || null, // ✅ Store AI price
+					imageUrl: product.imageUrl || null,
+					userId: userId, // Required field
+				},
+			]);
+
+			if (insertError) {
+				console.error("Error inserting product:", insertError);
+				return;
+			}
+		}
+	} catch (err) {
+		console.error("Unexpected error in upsertProduct:", err);
+	}
 };
 
-export default { fetchProducts };
+
+
+// ✅ FIXED: Function now properly takes userId
+const storeProductsInSupabase = async (products, userId) => {
+	for (const product of products) {
+		await upsertProduct(product, userId);
+	}
+};

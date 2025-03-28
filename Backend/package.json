@@ -20,6 +20,8 @@
 	},
 	"homepage": "https://github.com/ItzMeSam13/AI-Dynamic-Pricing-System#readme",
 	"dependencies": {
+		"@google/genai": "^0.6.1",
+		"@google/generative-ai": "^0.24.0",
 		"@prisma/client": "^6.5.0",
 		"@supabase/supabase-js": "^2.49.3",
 		"axios": "^1.8.4",
