@@ -1,8 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/router"; // Import useRouter
 
 export default function SignUp() {
+	const router = useRouter(); // Initialize router
+
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
@@ -62,16 +65,9 @@ export default function SignUp() {
 			);
 
 			console.log("Signup Successful:", response.data);
-			alert(`Sign-Up Successful: ${response.data.message || "Welcome!"}`);
-
-			setFormData({
-				name: "",
-				email: "",
-				password: "",
-				businessName: "",
-				businessCategory: "",
-				businessSubCategory: "",
-			});
+			
+			// Redirect to login page after successful signup
+			router.push('/login');
 		} catch (error) {
 			if (error.response) {
 				console.error("Error Response:", error.response.data);
@@ -90,7 +86,7 @@ export default function SignUp() {
 	};
 
 	return (
-		<div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-white via-blue-100 to-blue-200">
+	<div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-white via-blue-100 to-blue-200">
 			<div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 				<h2 className="text-2xl font-semibold text-center text-gray-800">
 					Sign Up
