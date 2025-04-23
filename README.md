@@ -2,16 +2,13 @@
 Team Name: rm -rf*
 
 Team Members
-Prathamesh Naik(Team Leader): Phone No: 8007911907
-                              email: naikprathamesh782@gmail.com
+Prathamesh Naik(Team Leader): email: naikprathamesh782@gmail.com
                               contribution: Frontend and Backend Development
                               
-Sampreet Kalkundrikar       : Phone No: 9356354218
-                              email: sampreetkalkundrikar8@gmail.com
+Sampreet Kalkundrikar       : email: sampreetkalkundrikar8@gmail.com
                               contribution: Backend Development
                               
-Gangavarapu Kaarthikeya     : Phone no: 9371100450
-                              email: gkaarthikeya2006@gmail.com
+Gangavarapu Kaarthikeya     : email: gkaarthikeya2006@gmail.com
                               contribution: Frontend Development
 
 Folder Structure:
